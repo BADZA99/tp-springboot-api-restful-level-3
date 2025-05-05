@@ -104,4 +104,4 @@ L'application inclut une documentation complète de l'API :
 ---
 
 ## Conclusion
-Ce projet démontre l'implémentation d'une architecture basée sur des microservices avec une API RESTful de niveau 3. Il inclut une documentation complète et des outils pour tester et explorer l'API. Le dépôt est prêt pour soumission.
+Ce projet démontre l'implémentation d'une architecture basée sur des microservices avec une API RESTful de niveau 3. Il inclut une documentation complète et des outils pour tester et explorer l'API. 

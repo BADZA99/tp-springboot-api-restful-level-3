@@ -23,7 +23,9 @@ public class ProduitController {
     public List<EntityModel<Produit>> getAllProduits() {
         return produitRepository.findAll().stream().map(produit -> {
             EntityModel<Produit> model = EntityModel.of(produit);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ProduitController.class).getProduitById(produit.getId())).withSelfRel());
+            model.add(WebMvcLinkBuilder
+                    .linkTo(WebMvcLinkBuilder.methodOn(ProduitController.class).getProduitById(produit.getId()))
+                    .withSelfRel());
             return model;
         }).collect(Collectors.toList());
     }
@@ -32,22 +34,24 @@ public class ProduitController {
     public ResponseEntity<EntityModel<Produit>> getProduitById(@PathVariable Long id) {
         return produitRepository.findById(id).map(produit -> {
             EntityModel<Produit> model = EntityModel.of(produit);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ProduitController.class).getAllProduits()).withRel("all-produits"));
+            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ProduitController.class).getAllProduits())
+                    .withRel("all-produits"));
             return ResponseEntity.ok(model);
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Produit createProduit(@RequestBody Produit produit) {
+    public ResponseEntity<String> createProduit(@RequestBody Produit produit) {
         try {
-            return produitRepository.save(produit);
+            produitRepository.save(produit);
+            return ResponseEntity.ok("Produit créé avec succès.");
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la création du produit", e);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Produit> updateProduit(@PathVariable Long id, @RequestBody Produit produitDetails) {
+    public ResponseEntity<String> updateProduit(@PathVariable Long id, @RequestBody Produit produitDetails) {
         try {
             Optional<Produit> produitOptional = produitRepository.findById(id);
             if (produitOptional.isPresent()) {
@@ -55,8 +59,8 @@ public class ProduitController {
                 produit.setDesignation(produitDetails.getDesignation());
                 produit.setPrix(produitDetails.getPrix());
                 produit.setCategorie(produitDetails.getCategorie());
-                Produit updatedProduit = produitRepository.save(produit);
-                return ResponseEntity.ok(updatedProduit);
+                produitRepository.save(produit);
+                return ResponseEntity.ok("Produit mis à jour avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -66,11 +70,11 @@ public class ProduitController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduit(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProduit(@PathVariable Long id) {
         try {
             if (produitRepository.existsById(id)) {
                 produitRepository.deleteById(id);
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.ok("Produit supprimé avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }

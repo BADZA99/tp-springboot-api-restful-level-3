@@ -24,7 +24,10 @@ public class CommandeProduitController {
     public List<EntityModel<CommandeProduit>> getAllCommandeProduits() {
         return commandeProduitRepository.findAll().stream().map(commandeProduit -> {
             EntityModel<CommandeProduit> model = EntityModel.of(commandeProduit);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CommandeProduitController.class).getCommandeProduitById(commandeProduit.getId().getCommandeId(), commandeProduit.getId().getProduitId())).withSelfRel());
+            model.add(WebMvcLinkBuilder
+                    .linkTo(WebMvcLinkBuilder.methodOn(CommandeProduitController.class).getCommandeProduitById(
+                            commandeProduit.getId().getCommandeId(), commandeProduit.getId().getProduitId()))
+                    .withSelfRel());
             return model;
         }).collect(Collectors.toList());
     }
@@ -35,32 +38,34 @@ public class CommandeProduitController {
         CommandeProduitId id = new CommandeProduitId(commandeId, produitId);
         return commandeProduitRepository.findById(id).map(commandeProduit -> {
             EntityModel<CommandeProduit> model = EntityModel.of(commandeProduit);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CommandeProduitController.class).getAllCommandeProduits()).withRel("all-commande-produits"));
+            model.add(WebMvcLinkBuilder
+                    .linkTo(WebMvcLinkBuilder.methodOn(CommandeProduitController.class).getAllCommandeProduits())
+                    .withRel("all-commande-produits"));
             return ResponseEntity.ok(model);
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public CommandeProduit createCommandeProduit(@RequestBody CommandeProduit commandeProduit) {
+    public ResponseEntity<String> createCommandeProduit(@RequestBody CommandeProduit commandeProduit) {
         try {
-            return commandeProduitRepository.save(commandeProduit);
+            commandeProduitRepository.save(commandeProduit);
+            return ResponseEntity.ok("Produit de commande créé avec succès.");
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la création du produit de commande", e);
         }
     }
 
     @PutMapping("/{commandeId}/{produitId}")
-    public ResponseEntity<CommandeProduit> updateCommandeProduit(@PathVariable Long commandeId,
-            @PathVariable Long produitId, @RequestBody CommandeProduit commandeProduitDetails) {
+    public ResponseEntity<String> updateCommandeProduit(@PathVariable Long commandeId, @PathVariable Long produitId,
+            @RequestBody CommandeProduit commandeProduitDetails) {
         try {
             CommandeProduitId id = new CommandeProduitId(commandeId, produitId);
             Optional<CommandeProduit> commandeProduitOptional = commandeProduitRepository.findById(id);
             if (commandeProduitOptional.isPresent()) {
                 CommandeProduit commandeProduit = commandeProduitOptional.get();
                 commandeProduit.setQuantite(commandeProduitDetails.getQuantite());
-                // Ajoutez d'autres champs à mettre à jour si nécessaire
-                CommandeProduit updatedCommandeProduit = commandeProduitRepository.save(commandeProduit);
-                return ResponseEntity.ok(updatedCommandeProduit);
+                commandeProduitRepository.save(commandeProduit);
+                return ResponseEntity.ok("Produit de commande mis à jour avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -70,12 +75,12 @@ public class CommandeProduitController {
     }
 
     @DeleteMapping("/{commandeId}/{produitId}")
-    public ResponseEntity<Void> deleteCommandeProduit(@PathVariable Long commandeId, @PathVariable Long produitId) {
+    public ResponseEntity<String> deleteCommandeProduit(@PathVariable Long commandeId, @PathVariable Long produitId) {
         try {
             CommandeProduitId id = new CommandeProduitId(commandeId, produitId);
             if (commandeProduitRepository.existsById(id)) {
                 commandeProduitRepository.deleteById(id);
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.ok("Produit de commande supprimé avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }

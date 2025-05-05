@@ -23,7 +23,9 @@ public class CommandeController {
     public List<EntityModel<Commande>> getAllCommandes() {
         return commandeRepository.findAll().stream().map(commande -> {
             EntityModel<Commande> model = EntityModel.of(commande);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CommandeController.class).getCommandeById(commande.getId())).withSelfRel());
+            model.add(WebMvcLinkBuilder
+                    .linkTo(WebMvcLinkBuilder.methodOn(CommandeController.class).getCommandeById(commande.getId()))
+                    .withSelfRel());
             return model;
         }).collect(Collectors.toList());
     }
@@ -32,30 +34,32 @@ public class CommandeController {
     public ResponseEntity<EntityModel<Commande>> getCommandeById(@PathVariable Long id) {
         return commandeRepository.findById(id).map(commande -> {
             EntityModel<Commande> model = EntityModel.of(commande);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CommandeController.class).getAllCommandes()).withRel("all-commandes"));
+            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CommandeController.class).getAllCommandes())
+                    .withRel("all-commandes"));
             return ResponseEntity.ok(model);
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Commande createCommande(@RequestBody Commande commande) {
+    public ResponseEntity<String> createCommande(@RequestBody Commande commande) {
         try {
-            return commandeRepository.save(commande);
+            commandeRepository.save(commande);
+            return ResponseEntity.ok("Commande créée avec succès.");
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la création de la commande", e);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Commande> updateCommande(@PathVariable Long id, @RequestBody Commande commandeDetails) {
+    public ResponseEntity<String> updateCommande(@PathVariable Long id, @RequestBody Commande commandeDetails) {
         try {
             Optional<Commande> commandeOptional = commandeRepository.findById(id);
             if (commandeOptional.isPresent()) {
                 Commande commande = commandeOptional.get();
                 commande.setDateCommande(commandeDetails.getDateCommande());
                 commande.setUtilisateur(commandeDetails.getUtilisateur());
-                Commande updatedCommande = commandeRepository.save(commande);
-                return ResponseEntity.ok(updatedCommande);
+                commandeRepository.save(commande);
+                return ResponseEntity.ok("Commande mise à jour avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -65,11 +69,11 @@ public class CommandeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCommande(@PathVariable Long id) {
+    public ResponseEntity<String> deleteCommande(@PathVariable Long id) {
         try {
             if (commandeRepository.existsById(id)) {
                 commandeRepository.deleteById(id);
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.ok("Commande supprimée avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }

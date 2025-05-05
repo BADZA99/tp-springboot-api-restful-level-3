@@ -54,23 +54,24 @@ public class CategorieController {
     }
 
     @PostMapping
-    public Categorie createCategorie(@RequestBody Categorie categorie) {
+    public ResponseEntity<String> createCategorie(@RequestBody Categorie categorie) {
         try {
-            return categorieRepository.save(categorie);
+            categorieRepository.save(categorie);
+            return ResponseEntity.ok("Catégorie créée avec succès.");
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la création de la catégorie", e);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Categorie> updateCategorie(@PathVariable Long id, @RequestBody Categorie categorieDetails) {
+    public ResponseEntity<String> updateCategorie(@PathVariable Long id, @RequestBody Categorie categorieDetails) {
         try {
             Optional<Categorie> categorieOptional = categorieRepository.findById(id);
             if (categorieOptional.isPresent()) {
                 Categorie categorie = categorieOptional.get();
                 categorie.setNom(categorieDetails.getNom());
-                Categorie updatedCategorie = categorieRepository.save(categorie);
-                return ResponseEntity.ok(updatedCategorie);
+                categorieRepository.save(categorie);
+                return ResponseEntity.ok("Catégorie mise à jour avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -80,11 +81,11 @@ public class CategorieController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategorie(@PathVariable Long id) {
+    public ResponseEntity<String> deleteCategorie(@PathVariable Long id) {
         try {
             if (categorieRepository.existsById(id)) {
                 categorieRepository.deleteById(id);
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.ok("Catégorie supprimée avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }

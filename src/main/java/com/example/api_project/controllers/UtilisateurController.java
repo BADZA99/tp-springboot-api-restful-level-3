@@ -23,7 +23,9 @@ public class UtilisateurController {
     public List<EntityModel<Utilisateur>> getAllUtilisateurs() {
         return utilisateurRepository.findAll().stream().map(utilisateur -> {
             EntityModel<Utilisateur> model = EntityModel.of(utilisateur);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UtilisateurController.class).getUtilisateurById(utilisateur.getId())).withSelfRel());
+            model.add(WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder.methodOn(UtilisateurController.class).getUtilisateurById(utilisateur.getId()))
+                    .withSelfRel());
             return model;
         }).collect(Collectors.toList());
     }
@@ -32,22 +34,25 @@ public class UtilisateurController {
     public ResponseEntity<EntityModel<Utilisateur>> getUtilisateurById(@PathVariable Long id) {
         return utilisateurRepository.findById(id).map(utilisateur -> {
             EntityModel<Utilisateur> model = EntityModel.of(utilisateur);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UtilisateurController.class).getAllUtilisateurs()).withRel("all-utilisateurs"));
+            model.add(WebMvcLinkBuilder
+                    .linkTo(WebMvcLinkBuilder.methodOn(UtilisateurController.class).getAllUtilisateurs())
+                    .withRel("all-utilisateurs"));
             return ResponseEntity.ok(model);
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Utilisateur createUtilisateur(@RequestBody Utilisateur utilisateur) {
+    public ResponseEntity<String> createUtilisateur(@RequestBody Utilisateur utilisateur) {
         try {
-            return utilisateurRepository.save(utilisateur);
+            utilisateurRepository.save(utilisateur);
+            return ResponseEntity.ok("Utilisateur créé avec succès.");
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la création de l'utilisateur", e);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Utilisateur> updateUtilisateur(@PathVariable Long id,
+    public ResponseEntity<String> updateUtilisateur(@PathVariable Long id,
             @RequestBody Utilisateur utilisateurDetails) {
         try {
             Optional<Utilisateur> utilisateurOptional = utilisateurRepository.findById(id);
@@ -55,8 +60,8 @@ public class UtilisateurController {
                 Utilisateur utilisateur = utilisateurOptional.get();
                 utilisateur.setLogin(utilisateurDetails.getLogin());
                 utilisateur.setPassword(utilisateurDetails.getPassword());
-                Utilisateur updatedUtilisateur = utilisateurRepository.save(utilisateur);
-                return ResponseEntity.ok(updatedUtilisateur);
+                utilisateurRepository.save(utilisateur);
+                return ResponseEntity.ok("Utilisateur mis à jour avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -66,11 +71,11 @@ public class UtilisateurController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUtilisateur(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUtilisateur(@PathVariable Long id) {
         try {
             if (utilisateurRepository.existsById(id)) {
                 utilisateurRepository.deleteById(id);
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.ok("Utilisateur supprimé avec succès.");
             } else {
                 return ResponseEntity.notFound().build();
             }
