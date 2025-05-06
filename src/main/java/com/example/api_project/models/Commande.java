@@ -1,8 +1,10 @@
 package com.example.api_project.models;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "commande")
@@ -18,6 +20,10 @@ public class Commande {
 
     @Column(name = "date_commande", nullable = false)
     private LocalDate dateCommande;
+
+    @OneToMany(mappedBy = "commande", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<CommandeProduit> commandeProduits;
 
     public Commande() {
         // Constructeur par défaut
@@ -53,5 +59,11 @@ public class Commande {
         this.dateCommande = dateCommande;
     }
 
-   
+    public List<CommandeProduit> getCommandeProduits() {
+        return commandeProduits;
+    }
+
+    public void setCommandeProduits(List<CommandeProduit> commandeProduits) {
+        this.commandeProduits = commandeProduits;
+    }
 }

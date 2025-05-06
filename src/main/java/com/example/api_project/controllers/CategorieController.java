@@ -1,5 +1,6 @@
 package com.example.api_project.controllers;
 
+import com.example.api_project.dto.CategorieDTO;
 import com.example.api_project.models.Categorie;
 import com.example.api_project.repositories.CategorieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.hibernate.Hibernate;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -20,37 +22,24 @@ public class CategorieController {
     private CategorieRepository categorieRepository;
 
     @GetMapping
-    public List<EntityModel<Categorie>> getAllCategories() {
-        try {
-            List<Categorie> categories = categorieRepository.findAll();
-            return categories.stream().map(categorie -> {
-                EntityModel<Categorie> model = EntityModel.of(categorie);
-                model.add(WebMvcLinkBuilder.linkTo(
-                        WebMvcLinkBuilder.methodOn(CategorieController.class).getCategorieById(categorie.getId()))
-                        .withSelfRel());
-                return model;
-            }).collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la récupération des catégories", e);
-        }
+    public List<CategorieDTO> getAllCategories() {
+        return categorieRepository.findAll().stream().map(categorie -> {
+            List<String> produits = categorie.getProduits().stream()
+                    .map(produit -> produit.getDesignation())
+                    .collect(Collectors.toList());
+            return new CategorieDTO(categorie.getId(), categorie.getNom(), produits);
+        }).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Categorie>> getCategorieById(@PathVariable Long id) {
-        try {
-            Optional<Categorie> categorie = categorieRepository.findById(id);
-            if (categorie.isPresent()) {
-                EntityModel<Categorie> model = EntityModel.of(categorie.get());
-                model.add(WebMvcLinkBuilder
-                        .linkTo(WebMvcLinkBuilder.methodOn(CategorieController.class).getAllCategories())
-                        .withRel("all-categories"));
-                return ResponseEntity.ok(model);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la récupération de la catégorie", e);
-        }
+    public ResponseEntity<CategorieDTO> getCategorieById(@PathVariable Long id) {
+        return categorieRepository.findById(id).map(categorie -> {
+            List<String> produits = categorie.getProduits().stream()
+                    .map(produit -> produit.getDesignation())
+                    .collect(Collectors.toList());
+            CategorieDTO categorieDTO = new CategorieDTO(categorie.getId(), categorie.getNom(), produits);
+            return ResponseEntity.ok(categorieDTO);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping

@@ -48,6 +48,17 @@ public class CommandeProduitController {
     @PostMapping
     public ResponseEntity<String> createCommandeProduit(@RequestBody CommandeProduit commandeProduit) {
         try {
+            // Vérification et initialisation des relations
+            if (commandeProduit.getCommande() == null || commandeProduit.getProduit() == null) {
+                return ResponseEntity.badRequest().body("Commande et Produit doivent être spécifiés.");
+            }
+
+            // Génération de l'ID composite
+            CommandeProduitId id = new CommandeProduitId(
+                    commandeProduit.getCommande().getId(),
+                    commandeProduit.getProduit().getId());
+            commandeProduit.setId(id);
+
             commandeProduitRepository.save(commandeProduit);
             return ResponseEntity.ok("Produit de commande créé avec succès.");
         } catch (Exception e) {

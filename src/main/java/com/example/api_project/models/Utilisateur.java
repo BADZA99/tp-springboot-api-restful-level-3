@@ -1,6 +1,8 @@
 package com.example.api_project.models;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
 
 @Entity
 @Table(name = "utilisateur")
@@ -15,6 +17,10 @@ public class Utilisateur {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "utilisateur", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Commande> commandes;
 
     public Utilisateur() {
         // Constructeur par défaut
@@ -50,4 +56,11 @@ public class Utilisateur {
         this.password = password;
     }
 
+    public List<Commande> getCommandes() {
+        return commandes;
+    }
+
+    public void setCommandes(List<Commande> commandes) {
+        this.commandes = commandes;
+    }
 }

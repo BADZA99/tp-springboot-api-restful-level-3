@@ -1,6 +1,7 @@
 package com.example.api_project.models;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 
@@ -20,6 +21,7 @@ public class Produit {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categorie_id")
+    @JsonIgnore
     private Categorie categorie;
 
     public Produit() {

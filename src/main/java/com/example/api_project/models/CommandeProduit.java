@@ -8,18 +8,18 @@ public class CommandeProduit {
     @EmbeddedId
     private CommandeProduitId id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("commandeId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "commande_id", nullable = false)
+    @JoinColumn(name = "commande_id")
     private Commande commande;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("produitId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "produit_id", nullable = false)
-    private com.example.api_project.models.Produit produit;
+    @JoinColumn(name = "produit_id")
+    private Produit produit;
 
     @Column(name = "quantite", nullable = false)
-    private int quantite;
+    private Integer quantite;
 
     public CommandeProduit() {
         // Constructeur par défaut
@@ -29,7 +29,6 @@ public class CommandeProduit {
         this.id = id;
         this.commande = commande;
         this.produit = produit;
-
     }
 
     public CommandeProduitId getId() {
@@ -48,19 +47,19 @@ public class CommandeProduit {
         this.commande = commande;
     }
 
-    public com.example.api_project.models.Produit getProduit() {
+    public Produit getProduit() {
         return produit;
     }
 
-    public void setProduit(com.example.api_project.models.Produit produit) {
+    public void setProduit(Produit produit) {
         this.produit = produit;
     }
 
-    public int getQuantite() {
+    public Integer getQuantite() {
         return quantite;
     }
 
-    public void setQuantite(int quantite) {
+    public void setQuantite(Integer quantite) {
         this.quantite = quantite;
     }
 

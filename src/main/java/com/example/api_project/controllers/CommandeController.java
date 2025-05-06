@@ -1,10 +1,9 @@
 package com.example.api_project.controllers;
 
+import com.example.api_project.dto.CommandeDTO;
 import com.example.api_project.models.Commande;
 import com.example.api_project.repositories.CommandeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,23 +19,19 @@ public class CommandeController {
     private CommandeRepository commandeRepository;
 
     @GetMapping
-    public List<EntityModel<Commande>> getAllCommandes() {
+    public List<CommandeDTO> getAllCommandes() {
         return commandeRepository.findAll().stream().map(commande -> {
-            EntityModel<Commande> model = EntityModel.of(commande);
-            model.add(WebMvcLinkBuilder
-                    .linkTo(WebMvcLinkBuilder.methodOn(CommandeController.class).getCommandeById(commande.getId()))
-                    .withSelfRel());
-            return model;
+            String utilisateurLogin = commande.getUtilisateur() != null ? commande.getUtilisateur().getLogin() : null;
+            return new CommandeDTO(commande.getId(), commande.getDateCommande(), utilisateurLogin);
         }).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Commande>> getCommandeById(@PathVariable Long id) {
+    public ResponseEntity<CommandeDTO> getCommandeById(@PathVariable Long id) {
         return commandeRepository.findById(id).map(commande -> {
-            EntityModel<Commande> model = EntityModel.of(commande);
-            model.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CommandeController.class).getAllCommandes())
-                    .withRel("all-commandes"));
-            return ResponseEntity.ok(model);
+            String utilisateurLogin = commande.getUtilisateur() != null ? commande.getUtilisateur().getLogin() : null;
+            CommandeDTO commandeDTO = new CommandeDTO(commande.getId(), commande.getDateCommande(), utilisateurLogin);
+            return ResponseEntity.ok(commandeDTO);
         }).orElse(ResponseEntity.notFound().build());
     }
 

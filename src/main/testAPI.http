@@ -12,73 +12,79 @@ POST http://localhost:8080/api/categories
 Content-Type: application/json
 
 {
-    "nom": "cosmétique"
+    "nom": "parfumerie"
 }
 
 
 ### Mettre à jour une catégorie existante
-PUT http://localhost:8080/api/categories/{id}
+PUT http://localhost:8080/api/categories/1
 Content-Type: application/json
+
 {
-    "nom": "Nouveau nom de la catégorie"
+    "nom": "catégorie cosmetique"
 }
 
 ### Supprimer une catégorie par son ID
-DELETE http://localhost:8080/api/categories/{id}
+DELETE http://localhost:8080/api/categories/1
 
-### Produits
+
 ### Récupérer tous les produits
 GET http://localhost:8080/api/produits
 
+
 ### Récupérer un produit par son ID
-GET http://localhost:8080/api/produits/{id}
+GET http://localhost:8080/api/produits/1
 
 ### Créer un nouveau produit
 POST http://localhost:8080/api/produits
 Content-Type: application/json
+
 {
-    "designation": "Nom du produit",
+    "designation": "nova",
     "prix": 100.0,
-    "categorie": { "id": 1 }
+    "categorie": { "id": 2 }
 }
 
 ### Mettre à jour un produit existant
-PUT http://localhost:8080/api/produits/{id}
+PUT http://localhost:8080/api/produits/1
 Content-Type: application/json
+
 {
-    "designation": "Nouveau nom",
+    "designation": "nova 100",
     "prix": 120.0,
-    "categorie": { "id": 1 }
+    "categorie": { "id": 2 }
 }
 
 ### Supprimer un produit par son ID
-DELETE http://localhost:8080/api/produits/{id}
+DELETE http://localhost:8080/api/produits/1
 
 ### Commandes
 ### Récupérer toutes les commandes
 GET http://localhost:8080/api/commandes
 
 ### Récupérer une commande par son ID
-GET http://localhost:8080/api/commandes/{id}
+GET http://localhost:8080/api/commandes/1
 
 ### Créer une nouvelle commande
 POST http://localhost:8080/api/commandes
 Content-Type: application/json
+
 {
     "dateCommande": "2025-05-05",
     "utilisateur": { "id": 1 }
 }
 
 ### Mettre à jour une commande existante
-PUT http://localhost:8080/api/commandes/{id}
+PUT http://localhost:8080/api/commandes/1
 Content-Type: application/json
+
 {
-    "dateCommande": "2025-05-06",
+    "dateCommande": "2025-10-06",
     "utilisateur": { "id": 1 }
 }
 
 ### Supprimer une commande par son ID
-DELETE http://localhost:8080/api/commandes/{id}
+DELETE http://localhost:8080/api/commandes/1
 
 ### Produits de Commande
 ### Récupérer tous les produits de commande
@@ -90,6 +96,7 @@ GET http://localhost:8080/api/commande-produits/{commandeId}/{produitId}
 ### Créer un nouveau produit de commande
 POST http://localhost:8080/api/commande-produits
 Content-Type: application/json
+
 {
     "id": { "commandeId": 1, "produitId": 1 },
     "quantite": 2
@@ -110,23 +117,25 @@ DELETE http://localhost:8080/api/commande-produits/{commandeId}/{produitId}
 GET http://localhost:8080/api/utilisateurs
 
 ### Récupérer un utilisateur par son ID
-GET http://localhost:8080/api/utilisateurs/{id}
+GET http://localhost:8080/api/utilisateurs/1
 
 ### Créer un nouvel utilisateur
 POST http://localhost:8080/api/utilisateurs
 Content-Type: application/json
+
 {
-    "login": "nom_utilisateur",
-    "password": "mot_de_passe"
+    "login": "papabn",
+    "password": "passer"
 }
 
 ### Mettre à jour un utilisateur existant
-PUT http://localhost:8080/api/utilisateurs/{id}
+PUT http://localhost:8080/api/utilisateurs/1
 Content-Type: application/json
+
 {
-    "login": "nouveau_nom",
+    "login": "papabn2",
     "password": "nouveau_mot_de_passe"
 }
 
 ### Supprimer un utilisateur par son ID
-DELETE http://localhost:8080/api/utilisateurs/{id}
+DELETE http://localhost:8080/api/utilisateurs/1

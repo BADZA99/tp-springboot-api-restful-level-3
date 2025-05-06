@@ -15,6 +15,10 @@ public class CommandeProduitId implements java.io.Serializable {
     @Column(name = "produit_id", nullable = false)
     private Long produitId;
 
+    // Constructeur par défaut requis par Hibernate
+    public CommandeProduitId() {
+    }
+
     public CommandeProduitId(Long commandeId, Long produitId) {
         this.commandeId = commandeId;
         this.produitId = produitId;
