@@ -114,28 +114,51 @@ DELETE http://localhost:8080/api/commande-produits/{commandeId}/{produitId}
 
 ### Utilisateurs
 ### Récupérer tous les utilisateurs
-GET http://localhost:8080/api/utilisateurs
+GET http://localhost:8080/users
 
 ### Récupérer un utilisateur par son ID
-GET http://localhost:8080/api/utilisateurs/1
+GET http://localhost:8080/users/1
+
+
+
+### Authentification
 
 ### Créer un nouvel utilisateur
-POST http://localhost:8080/api/utilisateurs
+POST http://localhost:8080/users/auth/register
 Content-Type: application/json
 
 {
-    "login": "papabn",
-    "password": "passer"
+  "login": "testuser",
+  "password": "testpass"
 }
 
 ### Mettre à jour un utilisateur existant
-PUT http://localhost:8080/api/utilisateurs/1
+PUT http://localhost:8080/users/auth/1
 Content-Type: application/json
 
 {
-    "login": "papabn2",
-    "password": "nouveau_mot_de_passe"
+  "login": "papabn3",
+  "password": "nouveau_mot_de_passe"
 }
 
 ### Supprimer un utilisateur par son ID
-DELETE http://localhost:8080/api/utilisateurs/1
+DELETE http://localhost:8080/users/1
+
+### Authentification (générer un token)
+POST http://localhost:8080/users/auth/token
+Content-Type: application/json
+
+{
+  "login": "papabn3",
+  "password": "nouveau_mot_de_passe"
+}
+
+### Rafraîchir le token
+
+POST http://localhost:8080/users/auth/refresh-token
+Authorization: Bearer papabn3
+
+### Obtenir les infos de l'utilisateur connecté
+GET http://localhost:8080/users/auth/me
+Authorization: Bearer papabn3
+
