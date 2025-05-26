@@ -144,21 +144,32 @@ Content-Type: application/json
 ### Supprimer un utilisateur par son ID
 DELETE http://localhost:8080/users/1
 
-### Authentification (générer un token)
-POST http://localhost:8080/users/auth/token
+### 1. Créer un nouvel utilisateur
+POST http://localhost:8080/auth/register
 Content-Type: application/json
 
 {
-  "login": "papabn3",
-  "password": "nouveau_mot_de_passe"
+  "login": "testuser1",
+  "password": "testpass1"
 }
 
-### Rafraîchir le token
 
-POST http://localhost:8080/users/auth/refresh-token
-Authorization: Bearer papabn3
+### 2. Obtenir un token
+POST http://localhost:8080/auth/token
+Content-Type: application/json
 
-### Obtenir les infos de l'utilisateur connecté
-GET http://localhost:8080/users/auth/me
-Authorization: Bearer papabn3
+{
+  "login": "testuser1",
+  "password": "testpass1"
+}
+
+### 3. Tester l'accès authentifié
+GET http://localhost:8080/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJleHAiOjE3NDgzODE5MDksImlhdCI6MTc0ODI5NTUwOX0.YlW4dWe7h5mpfXUILMgynWVvuogs5BDyJslSVX-efi4
+
+### 4. Rafraichir le token
+POST http://localhost:8080/auth/refresh-token
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJleHAiOjE3NDgzODEwNDksImlhdCI6MTc0ODI5NDY0OX0.XLyxvdZlQQeSGt2sbgl0GcKVrYyKRlK2baVgXwf2UBA
+
+
 

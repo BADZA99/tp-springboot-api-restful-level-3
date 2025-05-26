@@ -1,6 +1,7 @@
 package com.example.userservice.security;
 
 import com.example.userservice.repositories.UserRepository;
+import com.example.userservice.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.example.userservice.security.JwtAuthFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,7 +31,8 @@ public class SecurityConfig {
     @Autowired
     private UserRepository userRepository;
 
-    @Bean
+    @Autowired
+    private com.example.userservice.utils.JwtUtil jwtUtil;@Bean
     public UserDetailsService userDetailsService() {
         return login -> userRepository.findByLogin(login)
                 .map(user -> org.springframework.security.core.userdetails.User
@@ -53,23 +56,22 @@ public class SecurityConfig {
                 .passwordEncoder(passwordEncoder)
                 .and()
                 .build();
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, @Qualifier("userDetailsService") UserDetailsService userDetailsService, JwtAuthFilter jwtAuthFilter) throws Exception {
-        http.csrf().disable()
-                .cors().and()
-                .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.OPTIONS, "/users/auth/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/users/auth/register").permitAll()
-                .requestMatchers(HttpMethod.POST, "/users/auth/token").permitAll()
-                .requestMatchers(HttpMethod.POST, "/users/auth/refresh-token").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/users/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/users/auth/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+    }    @Bean
+    public JwtAuthFilter jwtAuthFilter(UserDetailsService userDetailsService) {
+        return new JwtAuthFilter(userDetailsService, jwtUtil);
+    }    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/auth/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/token").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
+                    .requestMatchers(HttpMethod.POST, "/auth/refresh-token").authenticated()
+                    .anyRequest().authenticated())
+                .sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
